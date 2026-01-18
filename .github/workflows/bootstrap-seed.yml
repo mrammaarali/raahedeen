@@ -1,0 +1,82 @@
+name: Bootstrap Seed
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed-firestore:
+    runs-on: ubuntu-latest
+
+    env:
+      FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+      OWNER_EMAIL: ${{ secrets.OWNER_EMAIL }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install firebase-admin
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install firebase-admin
+
+      - name: Run bootstrap seed script
+        run: |
+          node - <<'EOF'
+          const admin = require('firebase-admin');
+
+          const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+          const ownerEmail = process.env.OWNER_EMAIL;
+
+          admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            projectId: process.env.FIREBASE_PROJECT_ID,
+          });
+
+          const db = admin.firestore();
+
+          (async () => {
+            console.log('Seeding app_settings/default ...');
+
+            const settingsRef = db.collection('app_settings').doc('default');
+            await settingsRef.set(
+              {
+                appName: 'RaaheDeen',
+                whatsappNumber: '+918889544888',
+                radioStreamUrl: '',
+                donationUPI: '',
+                donationBankDetails: '',
+                donationQRImageUrl: '',
+                enabledLanguages: ['EN', 'HI', 'UR', 'AR'],
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+              },
+              { merge: true }
+            );
+
+            console.log('Trying to promote owner email as admin:', ownerEmail);
+
+            try {
+              const user = await admin.auth().getUserByEmail(ownerEmail);
+              await admin.auth().setCustomUserClaims(user.uid, { admin: true });
+              console.log('✅ Owner promoted to admin:', ownerEmail);
+            } catch (err) {
+              if (err.code === 'auth/user-not-found') {
+                console.log('⚠️ Owner user not found. Sign up in the app with this email, then re-run this workflow.');
+              } else {
+                console.error('Error while promoting owner:', err);
+                process.exitCode = 1;
+              }
+            }
+
+            console.log('Bootstrap seed completed.');
+          })().catch(err => {
+            console.error(err);
+            process.exit(1);
+          });
+          EOF
