@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18",
+    "ignore": [
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/.github/**"
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
+}

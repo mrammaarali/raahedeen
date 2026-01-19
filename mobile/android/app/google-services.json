@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "856086369170",
+    "project_id": "raahedeen-in-prod",
+    "storage_bucket": "raahedeen-in-prod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:856086369170:android:75d0233075b73b6aab674b",
+        "android_client_info": {
+          "package_name": "com.raahedeen.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "856086369170-qqp3u6dtsbm4u4kckqen83jasr0ikmi9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOhdtMWyDAkiq608wJNWNBz1q56DxqqnM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "856086369170-qqp3u6dtsbm4u4kckqen83jasr0ikmi9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

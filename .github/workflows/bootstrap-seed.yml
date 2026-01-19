@@ -1,0 +1,26 @@
+name: Bootstrap Seed
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Admin SDK
+        run: npm i firebase-admin@12.5.0
+
+      - name: Run bootstrap seed
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          OWNER_EMAIL: ${{ secrets.OWNER_EMAIL }}
+        run: node backend/tools/bootstrap-seed.mjs

@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===========
+    //  Functions
+    // ===========
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      // Admins have a custom claim { role: 'admin' }
+      return isSignedIn() && request.auth.token.role == 'admin';
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ===========
+    //  Admin Collections (Full Access for Admins)
+    // ===========
+    match /users/{uid} {
+      allow read, write: if isAdmin();
+      allow read, update: if isOwner(uid);
+    }
+
+    match /user_settings/{uid} {
+      allow read, write: if isOwner(uid) || isAdmin();
+    }
+    
+    match /app_settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ===========
+    //  Content Collections
+    // ===========
+    match /audiobook_chapters/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+
+      match /faqs/{faqId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+
+    match /duas/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ===========
+    //  Finder Collections
+    // ===========
+    match /finder_rules/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /finder_requests/{docId} {
+      allow create: if isSignedIn();
+      allow read: if isOwner(request.resource.data.uid) || isAdmin();
+      allow update: if isAdmin(); // Only admins can update status
+    }
+
+    // ===========
+    //  User-Specific Collections
+    // ===========
+    match /playback_progress/{docId} {
+        allow read, write: if isOwner(request.resource.data.uid);
+    }
+
+    match /tasbeeh_history/{docId} {
+        allow read, write: if isOwner(request.resource.data.uid);
+    }
+  }
+}

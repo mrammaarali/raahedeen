@@ -1,0 +1,48 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'mobile/**'
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'
+
+      - name: Configure Android google-services.json
+        working-directory: mobile/android/app
+        shell: bash
+        env:
+          ANDROID_GOOGLE_SERVICES_JSON: ${{ secrets.ANDROID_GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ ! -f ../../../pubspec.yaml ]; then
+            cd ../..
+            flutter create --project-name raahedeen --org com.raahedeen.app mobile
+            cd -
+          fi
+          echo "$ANDROID_GOOGLE_SERVICES_JSON" > google-services.json
+
+      - name: Flutter Pub Get
+        working-directory: mobile
+        run: flutter pub get
+
+      - name: Build debug APK
+        working-directory: mobile
+        run: flutter build apk --debug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: raahedeen-debug-apk
+          path: mobile/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
