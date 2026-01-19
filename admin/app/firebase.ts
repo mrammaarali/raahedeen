@@ -12,9 +12,9 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// This function ensures Firebase is initialized only once, and only on the client.
+// Ensure Firebase is initialized only once (client or server).
 const getFirebaseApp = () => {
-  if (typeof window !== 'undefined' && !getApps().length) {
+  if (!getApps().length) {
     return initializeApp(firebaseConfig);
   }
   return getApp();
