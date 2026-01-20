@@ -34,7 +34,7 @@ jobs:
           from pathlib import Path
           import re
 
-          root = Path(__file__).resolve().parents[3] / 'android'
+          root = Path.cwd().parent
           if root.exists():
             files = [
               root / 'build.gradle',
