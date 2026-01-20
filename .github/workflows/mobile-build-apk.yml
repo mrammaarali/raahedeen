@@ -30,6 +30,9 @@ jobs:
             flutter create --project-name raahedeen --org com.raahedeen.app .
             cd -
           fi
+          if [ -f ../../../android/build.gradle ]; then
+            sed -i "s/ext.kotlin_version = '.*'/ext.kotlin_version = '1.9.0'/" ../../../android/build.gradle
+          fi
           echo "$ANDROID_GOOGLE_SERVICES_JSON" > google-services.json
 
       - name: Flutter Pub Get
