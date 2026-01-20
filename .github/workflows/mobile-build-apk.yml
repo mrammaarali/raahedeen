@@ -30,22 +30,34 @@ jobs:
             flutter create --project-name raahedeen --org com.raahedeen.app .
             cd -
           fi
-          if [ -f ../build.gradle ]; then
-            sed -i "s/ext.kotlin_version = '.*'/ext.kotlin_version = '1.9.0'/" ../build.gradle
-          fi
-          if [ -f ../gradle.properties ]; then
-            if ! grep -q "kotlin.version" ../gradle.properties; then
-              echo "kotlin.version=1.9.0" >> ../gradle.properties
-            else
-              sed -i "s/^kotlin.version=.*/kotlin.version=1.9.0/" ../gradle.properties
-            fi
-          fi
-          if [ -f ../settings.gradle ]; then
-            sed -i "s/org.jetbrains.kotlin.android' version '[^']*'/org.jetbrains.kotlin.android' version '1.9.0'/" ../settings.gradle
-          fi
-          if [ -f ../settings.gradle.kts ]; then
-            sed -i "s/org.jetbrains.kotlin.android\" version \"[^\"]*\"/org.jetbrains.kotlin.android\" version \"1.9.0\"/" ../settings.gradle.kts
-          fi
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path(__file__).resolve().parents[3] / 'android'
+          if root.exists():
+            files = [
+              root / 'build.gradle',
+              root / 'build.gradle.kts',
+              root / 'settings.gradle',
+              root / 'settings.gradle.kts',
+              root / 'gradle.properties',
+            ]
+            for path in files:
+              if not path.exists():
+                continue
+              text = path.read_text()
+              text = re.sub(r"ext\.kotlin_version\s*=\s*['\"][^'\"]+['\"]", "ext.kotlin_version = '1.9.0'", text)
+              text = re.sub(r"kotlin\.version\s*=\s*[^\n]+", "kotlin.version=1.9.0", text)
+              text = re.sub(r"org\.jetbrains\.kotlin\.android['\"]\s+version\s+['\"][^'\"]+['\"]",
+                            "org.jetbrains.kotlin.android' version '1.9.0'", text)
+              text = re.sub(r'id\("org\.jetbrains\.kotlin\.android"\)\s+version\s+"[^"]+"',
+                            'id("org.jetbrains.kotlin.android") version "1.9.0"', text)
+              path.write_text(text)
+            gp = root / 'gradle.properties'
+            if gp.exists() and 'kotlin.version=1.9.0' not in gp.read_text():
+              gp.write_text(gp.read_text() + "\nkotlin.version=1.9.0\n")
+          PY
           echo "$ANDROID_GOOGLE_SERVICES_JSON" > google-services.json
 
       - name: Flutter Pub Get
