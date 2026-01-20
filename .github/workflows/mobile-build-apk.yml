@@ -25,9 +25,9 @@ jobs:
         env:
           ANDROID_GOOGLE_SERVICES_JSON: ${{ secrets.ANDROID_GOOGLE_SERVICES_JSON }}
         run: |
-          if [ ! -f ../../../pubspec.yaml ]; then
+          if [ ! -f ../../../android/app/build.gradle ] && [ ! -f ../../../android/app/build.gradle.kts ]; then
             cd ../..
-            flutter create --project-name raahedeen --org com.raahedeen.app mobile
+            flutter create --project-name raahedeen --org com.raahedeen.app .
             cd -
           fi
           echo "$ANDROID_GOOGLE_SERVICES_JSON" > google-services.json
