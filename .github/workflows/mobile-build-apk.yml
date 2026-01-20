@@ -33,6 +33,13 @@ jobs:
           if [ -f ../../../android/build.gradle ]; then
             sed -i "s/ext.kotlin_version = '.*'/ext.kotlin_version = '1.9.0'/" ../../../android/build.gradle
           fi
+          if [ -f ../../../android/gradle.properties ]; then
+            if ! grep -q "kotlin.version" ../../../android/gradle.properties; then
+              echo "kotlin.version=1.9.0" >> ../../../android/gradle.properties
+            else
+              sed -i "s/^kotlin.version=.*/kotlin.version=1.9.0/" ../../../android/gradle.properties
+            fi
+          fi
           echo "$ANDROID_GOOGLE_SERVICES_JSON" > google-services.json
 
       - name: Flutter Pub Get
