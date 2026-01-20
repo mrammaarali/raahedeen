@@ -25,26 +25,26 @@ jobs:
         env:
           ANDROID_GOOGLE_SERVICES_JSON: ${{ secrets.ANDROID_GOOGLE_SERVICES_JSON }}
         run: |
-          if [ ! -f ../../../android/app/build.gradle ] && [ ! -f ../../../android/app/build.gradle.kts ]; then
+          if [ ! -f build.gradle ] && [ ! -f build.gradle.kts ]; then
             cd ../..
             flutter create --project-name raahedeen --org com.raahedeen.app .
             cd -
           fi
-          if [ -f ../../../android/build.gradle ]; then
-            sed -i "s/ext.kotlin_version = '.*'/ext.kotlin_version = '1.9.0'/" ../../../android/build.gradle
+          if [ -f ../build.gradle ]; then
+            sed -i "s/ext.kotlin_version = '.*'/ext.kotlin_version = '1.9.0'/" ../build.gradle
           fi
-          if [ -f ../../../android/gradle.properties ]; then
-            if ! grep -q "kotlin.version" ../../../android/gradle.properties; then
-              echo "kotlin.version=1.9.0" >> ../../../android/gradle.properties
+          if [ -f ../gradle.properties ]; then
+            if ! grep -q "kotlin.version" ../gradle.properties; then
+              echo "kotlin.version=1.9.0" >> ../gradle.properties
             else
-              sed -i "s/^kotlin.version=.*/kotlin.version=1.9.0/" ../../../android/gradle.properties
+              sed -i "s/^kotlin.version=.*/kotlin.version=1.9.0/" ../gradle.properties
             fi
           fi
-          if [ -f ../../../android/settings.gradle ]; then
-            sed -i "s/org.jetbrains.kotlin.android' version '[^']*'/org.jetbrains.kotlin.android' version '1.9.0'/" ../../../android/settings.gradle
+          if [ -f ../settings.gradle ]; then
+            sed -i "s/org.jetbrains.kotlin.android' version '[^']*'/org.jetbrains.kotlin.android' version '1.9.0'/" ../settings.gradle
           fi
-          if [ -f ../../../android/settings.gradle.kts ]; then
-            sed -i "s/org.jetbrains.kotlin.android\" version \"[^\"]*\"/org.jetbrains.kotlin.android\" version \"1.9.0\"/" ../../../android/settings.gradle.kts
+          if [ -f ../settings.gradle.kts ]; then
+            sed -i "s/org.jetbrains.kotlin.android\" version \"[^\"]*\"/org.jetbrains.kotlin.android\" version \"1.9.0\"/" ../settings.gradle.kts
           fi
           echo "$ANDROID_GOOGLE_SERVICES_JSON" > google-services.json
 
