@@ -21,8 +21,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const auth = getFirebaseAuth();
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const tokenResult = await getIdTokenResult(user);
-        setIsAdmin(tokenResult.claims.admin === true);
+        const tokenResult = await getIdTokenResult(user, true); // Force refresh
+        setIsAdmin(tokenResult.claims.role === 'admin');
       }
       setUser(user);
       setLoading(false);
