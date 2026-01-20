@@ -13,7 +13,7 @@ const firebaseConfig = {
 };
 
 // Ensure Firebase is initialized only once (client or server).
-const getFirebaseApp = () => {
+export const getFirebaseApp = () => {
   if (!getApps().length) {
     return initializeApp(firebaseConfig);
   }

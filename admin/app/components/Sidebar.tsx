@@ -9,7 +9,7 @@ const navLinks = [
   { name: 'Products', href: '/products' },
   { name: 'Finder Rules', href: '/finder-rules' },
   { name: 'Finder Requests', href: '/finder-requests' },
-  { name: 'Manage Duas', href: '/duas' },
+  { name: 'Manage Duas', href: '/manage-duas' },
   { name: 'Users', href: '/users' },
   { name: 'Settings', href: '/settings' },
 ];

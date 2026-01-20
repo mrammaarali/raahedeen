@@ -3,14 +3,13 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ===========
-    //  Functions
+    //  Helper Functions
     // ===========
     function isSignedIn() {
       return request.auth != null;
     }
 
     function isAdmin() {
-      // Admins have a custom claim { role: 'admin' }
       return isSignedIn() && request.auth.token.role == 'admin';
     }
 
@@ -19,26 +18,30 @@ service cloud.firestore {
     }
 
     // ===========
-    //  Admin Collections (Full Access for Admins)
+    //  Admin & User Data
     // ===========
     match /users/{uid} {
+      // Admins can read/write any user doc.
+      // Users can only read/update their own doc.
       allow read, write: if isAdmin();
       allow read, update: if isOwner(uid);
     }
 
     match /user_settings/{uid} {
+      // Users can manage their own settings. Admins can too.
       allow read, write: if isOwner(uid) || isAdmin();
     }
-    
+
+    // ===========
+    //  Public & Admin-Managed Content
+    // ===========
     match /app_settings/{docId} {
+      // Everyone can read settings. Only admins can write.
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // ===========
-    //  Content Collections
-    // ===========
-    match /audiobook_chapters/{docId} {
+    match /audiobookChapters/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }
@@ -58,23 +61,25 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // ===========
-    //  Finder Collections
-    // ===========
-    match /finder_rules/{docId} {
+    match /finderRules/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    match /finder_requests/{docId} {
-      allow create: if isSignedIn();
-      allow read: if isOwner(request.resource.data.uid) || isAdmin();
-      allow update: if isAdmin(); // Only admins can update status
+    // ===========
+    //  User-Generated Content
+    // ===========
+    match /gemstoneRequests/{docId} {
+      // Users can create requests for themselves.
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      // Admins can read all requests. Users can only read their own.
+      allow read: if isAdmin() || isOwner(resource.data.uid);
+      // Only admins can update status, etc.
+      allow update: if isAdmin();
+      // Users should not be able to delete their requests.
+      allow delete: if isAdmin();
     }
 
-    // ===========
-    //  User-Specific Collections
-    // ===========
     match /playback_progress/{docId} {
         allow read, write: if isOwner(request.resource.data.uid);
     }
