@@ -35,7 +35,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       final faqsSnapshot = await FirebaseFirestore.instance
           .collection('products')
           .doc(widget.product.id)
-          .collection('product_faqs')
+          .collection('faqs')
           .where('isActive', isEqualTo: true)
           .orderBy('displayOrder')
           .get();

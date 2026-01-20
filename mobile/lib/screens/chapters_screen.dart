@@ -15,7 +15,7 @@ class _ChaptersScreenState extends State<ChaptersScreen> {
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('audiobookChapters')
+          .collection('chapters')
           .where('isActive', isEqualTo: true)
           .orderBy('order')
           .snapshots(),
